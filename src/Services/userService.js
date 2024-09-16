@@ -36,4 +36,15 @@ const getUserContacts = async (userId) => {
         return { success: false, message: e.message };
     }
 }
-module.exports = { getUserByEmail, addUser, updateUser,getUserContacts };
+const addContactToUser = async (userId, emailFriend) => {
+    try {
+        const result = await userRepo.addContactToUser(userId, emailFriend)
+        return { success: result.success, message: result.message };
+    } catch (error) {
+        console.error("Error adding contact:", error);
+        return { success: false, message: error.message };
+    }
+};
+
+
+module.exports = { getUserByEmail, addUser, updateUser, getUserContacts, addContactToUser };

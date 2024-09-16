@@ -28,4 +28,40 @@ const getUserContacts = async (userId) => {
     return contacts; // אנשי הקשר עם השדות name ו-email
 };
 
-module.exports = { getUserByEmail, addUser, updateUser, getUserById, getUserContacts };
+const addContactToUser = async (userId, emailFriend) => {
+    console.log("hi");
+
+    try {
+        const user = await userModel.findById(userId);
+        if (!user) {
+            return { success: false, message: "User not found" };
+        }
+
+        const friend = await userModel.findOne({ email: emailFriend });
+        console.log(user);
+        console.log(friend);
+        if (!friend) {
+            return { success: false, message: "Friend not found" };
+        }
+
+        if (user._id == friend._id) {
+            return { success: false, message: "Unable to add yourself to contacts" };
+        }
+        // בדיקה אם איש הקשר כבר קיים
+        if (user.contacts.includes(friend._id)) {
+            return { success: false, message: "Contact already exists" };
+        }
+
+
+        user.contacts.push(friend._id);
+        await user.save();
+
+        return { success: true, message: "Contact added successfully" };
+    } catch (error) {
+        console.error("Error adding contact:", error);
+        return { success: false, message: error.message };
+    }
+};
+
+
+module.exports = { getUserByEmail, addUser, updateUser, getUserById, getUserContacts, addContactToUser };

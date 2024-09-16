@@ -66,4 +66,27 @@ router.get('/:id/contacts', async (req, res) => {
     }
 });
 
+router.post('/:id/contacts', async (req, res) => {
+    
+    const token = req.headers['x-access-token'];
+    if (!token) return res.status(401).json({ message: "No token provided" });
+
+    try {
+        const decoded = jwt.verify(token, "secret");
+        const userId = req.params.id;
+        const { emailFriend } = req.body;
+
+        if (decoded.email) {
+            const result = await userService.addContactToUser(userId, emailFriend);
+            if (!result.success) return res.status(400).json({ message: result.message, success:false });
+            return res.json({ message: result.message, success:true });
+        } else {
+            return res.status(403).json({ message: "Unauthorized", success:false });
+        }
+    } catch (e) {
+        return res.status(401).json({ message: e.message, success:false });
+    }
+});
+
+
 module.exports = router;
